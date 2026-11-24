@@ -17,15 +17,23 @@ Comando: `npm test` (22 test) e `npm run test:e2e` (55 controlli su Edge, modali
 - **AI reale (Gemini, modello gemini-3.1-flash-lite):** coordinatore → specialisti → risposta unica (verificato / ipotesi / suggerimenti / quando sentire il veterinario / dati mancanti); storico conversazioni; lettura scontrino da foto (importo 66,50 letto correttamente) con modulo di conferma e nulla salvato prima della conferma.
 - Coda offline e sincronizzazione cloud contro un **Supabase simulato in memoria**: accodamento, ordine, ritrasmissione senza duplicati, accorpamento di creazione+modifica (bug di perdita dati trovato e corretto dal test), conflitti, rifiuto del server, coda che sopravvive al riavvio.
 
+## Verificato sul cloud reale (24/11/2026) — app https://dog-app.pages.dev
+Comandi: `node tests/cloud-check.mjs` (14 controlli sul backend Supabase) e `node tests/e2e/cloud-live.mjs` (6 controlli su Edge contro l'app pubblicata). Usano utenti di prova creati e poi eliminati.
+- Migrazione SQL eseguita su Supabase reale: 20 tabelle, tutte con RLS attiva.
+- `create_household`, inserimento con `created_by` impostato dal trigger, audit log scritto dal trigger e non falsificabile dal client.
+- RLS: un utente estraneo non vede, non scrive e non cancella i dati di un'altra famiglia; l'anonimo non vede nulla.
+- Edge Function `ai-chat` distribuita: risponde con AI configurata, rifiuta chi non è loggato. `invite` distribuita: rifiuta un estraneo.
+- App pubblicata su Cloudflare Pages: login reale, creazione famiglia, nessun errore JS.
+
 ## NON verificato (scritto ma mai eseguito)
-1. **Supabase reale**: migrazione SQL, RLS, trigger di audit, funzioni (`create_household`, `claim_invites`, `remove_member`, `delete_household_data`, `delete_my_account`), bucket Storage, Realtime. Lo schema è stato scritto con cura ma non eseguito.
-2. **Registrazione/login/recupero password/inviti email/revoca accessi** (dipendono da Supabase Auth e dalla funzione `invite`).
-3. **Edge Functions** `ai-chat` e `invite` (mai distribuite). La logica condivisa `_shared/agents.ts` è invece testata (gira anche nel server locale).
-4. **Caricamento documenti in cloud** (Storage) e anteprima con URL firmati.
+1. **Invio reale di un invito email** e accettazione da parte di un secondo utente (`invite` provata solo nel rifiuto dell'estraneo); `claim_invites`, `remove_member`, `delete_household_data`, `delete_my_account` come flusso completo.
+2. **Registrazione con email di conferma, recupero password**: non provati (l'email gratuita di Supabase è limitata a poche all'ora).
+3. **Domanda AI completa via cloud** (`ask`/`extract` con la funzione distribuita): provato solo lo stato; la logica condivisa è testata in locale con Gemini reale.
+4. **Caricamento documenti in cloud** (Storage) e anteprima con URL firmati; Realtime.
 5. **iPhone/Safari**: installazione PWA, notifiche, fotocamera. Mai provato su un telefono. Windows: provato solo su Edge.
-6. **Pubblicazione Cloudflare Pages**: file pronti (`_redirects`, `_headers`), nessun deploy fatto; non esiste un indirizzo online.
-7. **Notifiche push ad app chiusa**: NON implementate (servono VAPID + servizio push). Sono presenti promemoria in-app e notifiche del dispositivo mentre l'app è aperta.
-8. **Sincronizzazione tra due dispositivi reali** (Realtime): non provata.
+6. **Notifiche push ad app chiusa**: NON implementate (servono VAPID + servizio push). Sono presenti promemoria in-app e notifiche del dispositivo mentre l'app è aperta.
+7. **Sincronizzazione tra due dispositivi reali**: non provata.
+8. **Aggiornamenti dell'app pubblicata**: il deploy è manuale (`npm run build` poi `wrangler pages deploy dist --project-name=dog-app`), non collegato a GitHub.
 
 ## Non implementato / semplificato rispetto alla specifica
 - Foto/video allegati direttamente ai singoli eventi di salute/benessere: si caricano nell'Archivio (categoria foto/video).
