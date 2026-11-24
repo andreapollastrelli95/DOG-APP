@@ -1,0 +1,47 @@
+DOG MANAGER — GUIDA PER LA FAMIGLIA
+====================================
+
+COSA FA
+Raccoglie in un posto solo salute, cibo, uscite, spese, appuntamenti, documenti e ricordi della
+nostra cagnolina. Tutti i familiari vedono gli stessi dati e ogni inserimento mostra chi l'ha fatto.
+
+I GESTI DI TUTTI I GIORNI (dalla schermata "Home")
+- REGISTRA PASTO / PASSEGGIATA / PESO / SPESA: un tocco, pochi campi, "Salva".
+- AGGIUNGI EVENTO: visite, vaccini, toelettatura, acquisti, scadenze.
+- CARICA DOCUMENTO: foto di un referto, fattura, certificato.
+- CHIEDI ALL'AI: domande sulla cagnolina (vedi sotto).
+La Home si aggiorna da sola quando un familiare registra qualcosa.
+
+I MENU
+- Salute: visite, vaccini, antiparassitari, farmaci, esami. Inserite farmaci e dosi SOLO come
+  indicati dal veterinario. "Esporta cartella clinica" crea un PDF da portare dal veterinario.
+- Alimentazione: pasti e prodotti. Indicate la scorta e la quantità giornaliera: l'app stima
+  quando finirà. Si può fotografare l'etichetta: l'AI propone i dati, voi li controllate e confermate.
+- Attività: passeggiate e giochi. L'obiettivo giornaliero lo stabilite voi (con il veterinario).
+- Benessere: una riga al giorno, con voti da 1 a 5 per umore, appetito, energia, sonno.
+- Spese: inserite le spese, impostate un budget, fotografate gli scontrini (l'AI propone, voi confermate).
+- Agenda: calendario condiviso con promemoria; spuntate gli eventi fatti.
+- Archivio: documenti, foto, video; ricerca per titolo, tag e categoria.
+- Luoghi: veterinario, clinica H24, toelettatore... Segnate i "contatti di emergenza".
+- Analisi e report: segnalazioni di cambiamenti e report settimanale/mensile/annuale in PDF.
+- Impostazioni: famiglia, tema chiaro/scuro, backup, cronologia modifiche, privacy.
+
+COME LEGGERE LE SEGNALAZIONI
+L'app confronta gli ultimi 7 giorni con le abitudini dei 28 giorni precedenti DELLA VOSTRA cagnolina,
+usando solo ciò che avete registrato. Più dati registrate, più è affidabile. Sono osservazioni,
+NON diagnosi: per qualsiasi dubbio, sentite il veterinario. In caso di urgenza chiamate subito
+il veterinario o la clinica H24 (Luoghi -> contatti di emergenza).
+
+L'ASSISTENTE AI
+Distingue sempre: DATI VERIFICATI (presi dai vostri dati), IPOTESI (da non prendere come diagnosi)
+e SUGGERIMENTI. Può richiedere anche 20-60 secondi. Se compare "AI non disponibile" il resto
+dell'app funziona comunque.
+
+SE NON C'È INTERNET
+L'app si apre lo stesso e potete registrare: le registrazioni vengono inviate appena torna la
+connessione (in alto compare "Offline" e quante ne mancano). Caricare documenti e usare l'AI
+richiedono la connessione.
+
+PRIVACY
+I dati sono privati della famiglia. Un amministratore può invitare o revocare un familiare.
+Da Impostazioni potete esportare tutto o eliminare tutti i dati.

@@ -1,0 +1,33 @@
+DOG MANAGER — INSTALLAZIONE (versione semplice)
+================================================
+
+Ci sono due modi di usare l'app.
+
+MODO 1 — Solo su questo PC (pronto subito, senza account)
+---------------------------------------------------------
+Serve Node.js (versione 20 o superiore) installato.
+
+1. Aprite la cartella "dog-manager".
+2. La prima volta, aprite un terminale in quella cartella e scrivete:
+      npm install
+3. Fate doppio clic su  "Avvia DOG MANAGER.cmd".
+   Si apre una finestra con l'app (la prima volta prepara l'app: attendete qualche secondo).
+4. Alla prima apertura create il profilo della cagnolina (menu "Profilo cagnolina").
+
+In questo modo i dati restano SOLO su questo PC e nel browser usato. Non c'è condivisione
+con i familiari. Fate ogni tanto un backup: Impostazioni -> "Backup completo (JSON)".
+
+Per provare l'app senza inserire nulla di vero: Impostazioni -> "Prova la demo".
+I dati demo sono evidenziati e separati da quelli reali.
+
+MODO 2 — In famiglia, da iPhone e PC (richiede la configurazione online)
+-------------------------------------------------------------------------
+Serve creare un progetto Supabase (gratuito) e pubblicare l'app su Cloudflare Pages.
+Seguite CONFIGURAZIONE.txt. Questa parte NON è ancora stata provata online: se qualcosa non
+funziona, è normale che serva un aggiustamento (vedi docs/STATO_VERIFICHE.md).
+
+INSTALLARE L'APP COME "APP" (dopo la pubblicazione online)
+----------------------------------------------------------
+- iPhone: aprite l'indirizzo con Safari -> tasto Condividi -> "Aggiungi a Home".
+- Windows: aprite con Edge o Chrome -> icona "Installa app" nella barra dell'indirizzo.
+  (In modalità locale su localhost, Edge permette di installarla allo stesso modo.)

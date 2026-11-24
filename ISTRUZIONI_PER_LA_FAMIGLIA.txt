@@ -1,0 +1,33 @@
+DOG MANAGER — ISTRUZIONI PER LA FAMIGLIA
+=========================================
+
+1) COME ENTRARE
+   L'app NON è ancora pubblicata online, quindi per ora non esiste un indirizzo da aprire
+   dall'iPhone. Per ora si usa sul PC di casa:
+   - fate doppio clic su "Avvia DOG MANAGER.cmd" (nella cartella dog-manager);
+   - si apre la finestra dell'app.
+   I dati restano su quel PC. Per usarla da iPhone e da più persone, bisogna prima pubblicarla
+   (vedi CONFIGURAZIONE.txt) e poi qui sotto comparirà l'indirizzo.
+
+2) DA iPHONE (dopo la pubblicazione)
+   - Aprite l'indirizzo in fondo a questo file con SAFARI.
+   - Toccate il tasto Condividi (quadrato con freccia) -> "Aggiungi a Home".
+   - Si crea l'icona "Dog Manager": aprite da lì.
+
+3) DA PC WINDOWS (dopo la pubblicazione)
+   - Aprite l'indirizzo con Edge o Chrome.
+   - Cliccate l'icona "Installa app" nella barra dell'indirizzo.
+
+4) COME INVITARE I FAMILIARI (dopo la pubblicazione)
+   - Chi crea la famiglia diventa Amministratore.
+   - Impostazioni -> Famiglia -> scrivete l'email del familiare -> "Invita".
+   - Il familiare riceve una email, sceglie la password e vede subito i dati della cagnolina.
+   - Per togliere un accesso: Impostazioni -> Famiglia -> "Revoca".
+
+5) LE FUNZIONI PRINCIPALI
+   Vedi GUIDA_FAMIGLIA.txt. In breve: dalla Home registrate pasto, passeggiata, peso e spese con un
+   tocco; in Agenda segnate visite e scadenze; in Archivio caricate i documenti; in "Analisi e report"
+   trovate le segnalazioni e i PDF; "Chiedi all'AI" per domande (non sostituisce il veterinario).
+
+INDIRIZZO DELL'APP
+   Non ancora pubblicata: nessun indirizzo disponibile.
