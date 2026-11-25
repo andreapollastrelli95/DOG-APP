@@ -1,4 +1,4 @@
-# 🐕 LILLA APP
+# 🐕 DOG APP
 
 Un'app per facilitare la gestione del cane con la possibilità di segnare visite, vaccini, spese e appuntamenti.
 Un assistente intelligente aiuta a capire se qualcosa è cambiato nel tempo e cosa fare.
