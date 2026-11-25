@@ -1,4 +1,4 @@
-# DOG MANAGER
+# LILLA APP
 
 Fascicolo digitale per la vita di una cagnolina, condiviso in famiglia. PWA in italiano (date `gg/mm/aaaa`, EUR, fuso Europe/Rome), installabile su iPhone e Windows.
 

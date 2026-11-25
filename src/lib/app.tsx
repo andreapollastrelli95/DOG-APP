@@ -50,7 +50,7 @@ export function AppProvider({ children }: { children: ReactNode }) {
   const [authReady, setAuthReady] = useState(!CLOUD_CONFIGURED)
   const [membership, setMembership] = useState<{ household_id: string; role: string; name: string } | null | 'none'>(null)
   const [store, setStore] = useState<Store | null>(null)
-  const [theme, setTheme] = useState<'light' | 'dark'>(() => (ls.get('dm.theme') as 'light' | 'dark') ?? (window.matchMedia?.('(prefers-color-scheme: dark)').matches ? 'dark' : 'light'))
+  const [theme, setTheme] = useState<'light' | 'dark'>(() => (ls.get('dm.theme') as 'light' | 'dark') ?? 'light')
   const [fatal, setFatal] = useState<string | null>(null)
   const storeRef = useRef<Store | null>(null)
 

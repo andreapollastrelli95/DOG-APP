@@ -18,28 +18,28 @@ export function buildPdf(title: string, subtitle: string, sections: PdfSection[]
       y = 20
     }
   }
-  doc.setFillColor(47, 74, 58)
+  doc.setFillColor(91, 45, 142)
   doc.rect(0, 0, W, 12, 'F')
-  doc.setTextColor(35, 48, 42)
+  doc.setTextColor(59, 26, 99)
   doc.setFont('helvetica', 'bold')
   doc.setFontSize(20)
   doc.text(title, M, y + 4)
   y += 11
   doc.setFont('helvetica', 'normal')
   doc.setFontSize(10)
-  doc.setTextColor(117, 111, 99)
+  doc.setTextColor(108, 85, 137)
   doc.text(subtitle, M, y)
   y += 10
   for (const s of sections) {
     ensure(16)
     doc.setFont('helvetica', 'bold')
     doc.setFontSize(13)
-    doc.setTextColor(47, 74, 58)
+    doc.setTextColor(91, 45, 142)
     doc.text(s.heading, M, y)
     y += 6
     doc.setFont('helvetica', 'normal')
     doc.setFontSize(10)
-    doc.setTextColor(35, 48, 42)
+    doc.setTextColor(59, 26, 99)
     for (const l of s.lines ?? []) {
       const wrapped = doc.splitTextToSize(l, W - 2 * M) as string[]
       ensure(wrapped.length * 5 + 1)
@@ -54,7 +54,7 @@ export function buildPdf(title: string, subtitle: string, sections: PdfSection[]
       doc.setFontSize(9)
       s.table.head.forEach((h, i) => doc.text(h, M + i * cw, y))
       y += 2
-      doc.setDrawColor(200, 190, 160)
+      doc.setDrawColor(214, 196, 238)
       doc.line(M, y, W - M, y)
       y += 4
       doc.setFont('helvetica', 'normal')
@@ -72,8 +72,8 @@ export function buildPdf(title: string, subtitle: string, sections: PdfSection[]
   for (let i = 1; i <= pages; i++) {
     doc.setPage(i)
     doc.setFontSize(8)
-    doc.setTextColor(150, 145, 130)
-    doc.text(`DOG MANAGER · generato il ${new Date().toLocaleDateString('it-IT')} · pagina ${i}/${pages}`, M, 292)
+    doc.setTextColor(140, 120, 165)
+    doc.text(`LILLA APP · generato il ${new Date().toLocaleDateString('it-IT')} · pagina ${i}/${pages}`, M, 292)
   }
   return doc
 }

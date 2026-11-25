@@ -7,6 +7,7 @@ import { eur, fmtDate, fmtDateTime, num, relativeDay } from '../lib/format'
 import { Badge, Button, Card, Stat } from '../components/ui'
 import { ResourceDialog } from '../components/Resource'
 import { useApp } from '../lib/app'
+import { PhotoGallery } from '../components/Gallery'
 
 const QUICK = [
   { label: 'Registra pasto', table: 'meals', icon: Utensils },
@@ -69,7 +70,7 @@ export default function Dashboard() {
             </>
           ) : (
             <>
-              <h1 className="font-display text-2xl">Benvenuti in DOG MANAGER</h1>
+              <h1 className="font-display text-2xl">Benvenuti in LILLA APP</h1>
               <p className="text-sm text-muted">Iniziate creando il profilo della cagnolina.</p>
             </>
           )}
@@ -78,6 +79,9 @@ export default function Dashboard() {
           {dog ? 'Apri profilo' : 'Crea profilo'}
         </Button>
       </Card>
+
+      <PhotoGallery />
+
 
       <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
         {QUICK.map((q) => (

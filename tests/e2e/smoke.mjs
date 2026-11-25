@@ -56,7 +56,7 @@ const save = () => page.getByRole('button', { name: 'Salva', exact: true }).clic
 try {
   // ---------- avvio ----------
   await page.goto(BASE)
-  await page.getByText('Benvenuti in DOG MANAGER').waitFor()
+  await page.getByText('Benvenuti in LILLA APP').waitFor()
   check('App si carica in modalità locale senza dati finti', true)
   check('Indicatore "solo su questo dispositivo" visibile', await page.getByText('Solo su questo dispositivo').first().isVisible())
   check('Nessuna pesata/ultima passeggiata inventata', (await page.getByText('Nessuna pesata').count()) > 0)
@@ -298,7 +298,7 @@ try {
   const reg = await page.evaluate(async () => { const r = await navigator.serviceWorker?.getRegistration(); return !!r })
   check('Service worker registrato', await until(async () => await page.evaluate(async () => !!(await navigator.serviceWorker?.getRegistration()))), String(reg))
   const manifest = await page.evaluate(() => fetch('/manifest.webmanifest').then((r) => r.json()))
-  check('Manifest valido (nome, icone, standalone)', manifest.name === 'DOG MANAGER' && manifest.display === 'standalone' && manifest.icons.length >= 3)
+  check('Manifest valido (nome, icone, standalone)', manifest.name === 'LILLA APP' && manifest.display === 'standalone' && manifest.icons.length >= 3)
   await page.waitForTimeout(1500)
   await page.reload() // assicura che il SW controlli la pagina
   await page.waitForTimeout(1000)

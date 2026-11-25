@@ -46,7 +46,7 @@ export function AuthScreen({ onDemo }: { onDemo: () => void }) {
             <PawPrint />
           </div>
           <div>
-            <h1 className="font-display text-2xl leading-none">DOG MANAGER</h1>
+            <h1 className="font-display text-2xl leading-none">LILLA APP</h1>
             <p className="text-xs text-muted">Il fascicolo digitale della nostra cagnolina</p>
           </div>
         </div>

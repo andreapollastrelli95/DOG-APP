@@ -5,7 +5,7 @@ export const cx = (...a: (string | false | null | undefined)[]) => a.filter(Bool
 
 export function Card({ children, className, ...p }: { children: ReactNode; className?: string } & React.HTMLAttributes<HTMLDivElement>) {
   return (
-    <div {...p} className={cx('rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_2px_rgba(35,48,42,.05)]', className)}>
+    <div {...p} className={cx('rounded-2xl border border-line bg-surface p-4 shadow-[0_1px_2px_rgba(59,26,99,.08)]', className)}>
       {children}
     </div>
   )

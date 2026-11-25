@@ -2,7 +2,7 @@ import { Bar, BarChart, CartesianGrid, Cell, Legend, Line, LineChart, Pie, PieCh
 import { Card } from './ui'
 import type { ReactNode } from 'react'
 
-export const PALETTE = ['#2f4a3a', '#8aa58f', '#b8923f', '#6b7f9c', '#a8402f', '#7a6a8a', '#4f8a8b', '#c97b4a', '#9aa17a', '#8a8478']
+export const PALETTE = ['#6b34a8', '#b394dd', '#c0559a', '#5c74b8', '#a8332f', '#b8923f', '#4f8a8b', '#c97b4a', '#9aa17a', '#8a8478']
 const axis = { stroke: 'var(--muted)', fontSize: 11 }
 const tip = { contentStyle: { background: 'var(--surface)', border: '1px solid var(--line)', borderRadius: 12, color: 'var(--ink)', fontSize: 12 } }
 

@@ -50,7 +50,7 @@ export default function Settings() {
   }
 
   async function exportJson() {
-    download(`dog-manager-export-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(await store.exportAll(), null, 2), 'application/json')
+    download(`lilla-app-export-${new Date().toISOString().slice(0, 10)}.json`, JSON.stringify(await store.exportAll(), null, 2), 'application/json')
   }
   async function exportCsv(t: string) {
     const def = TABLES[t]

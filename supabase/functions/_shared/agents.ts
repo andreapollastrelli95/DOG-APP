@@ -141,7 +141,7 @@ export async function routeQuestion(gemini: GeminiClient, question: string, toda
     .map((a) => `- ${a.id}: ${a.role}`)
     .join('\n')
   const out = await gemini({
-    system: `Sei il coordinatore di DOG MANAGER AI. Scegli quali specialisti servono per rispondere alla richiesta (da 1 a 2). Specialisti:\n${list}\nRispondi SOLO con JSON: {"agents": ["id", ...], "rationale": "una frase"}. Se la richiesta è generica sulla salute complessiva usa "wellness". Data: ${today}.`,
+    system: `Sei il coordinatore di LILLA APP AI. Scegli quali specialisti servono per rispondere alla richiesta (da 1 a 2). Specialisti:\n${list}\nRispondi SOLO con JSON: {"agents": ["id", ...], "rationale": "una frase"}. Se la richiesta è generica sulla salute complessiva usa "wellness". Data: ${today}.`,
     parts: [{ text: question }],
     json: true,
     temperature: 0,
@@ -207,7 +207,7 @@ export async function runAgents(gemini: GeminiClient, args: { question: string; 
     route.agents.map(async (id) => {
       const a = AGENTS[id]
       const text = await gemini({
-        system: `Sei "${a.name}", specialista di DOG MANAGER AI. ${a.instructions}\n${rules}\nProduci note di analisi concise (max 250 parole) con tre blocchi: DATI VERIFICATI, IPOTESI, SUGGERIMENTI.`,
+        system: `Sei "${a.name}", specialista di LILLA APP AI. ${a.instructions}\n${rules}\nProduci note di analisi concise (max 250 parole) con tre blocchi: DATI VERIFICATI, IPOTESI, SUGGERIMENTI.`,
         parts: [{ text: `Conversazione recente:\n${hist || '(nessuna)'}\n\nRichiesta: ${question}\n\nDati autorizzati (JSON):\n${dataJson}` }],
       })
       return `### ${a.name}\n${text}`
@@ -215,7 +215,7 @@ export async function runAgents(gemini: GeminiClient, args: { question: string; 
   )
 
   const final = await gemini({
-    system: `Sei il coordinatore di DOG MANAGER AI. Unisci le note degli specialisti in UNA risposta per la famiglia.\n${rules}\nRispondi SOLO con JSON con queste chiavi: {"summary": string (2-4 frasi), "verified": string[] (fatti presenti nei dati, con numeri/date), "hypotheses": string[] (interpretazioni possibili, formulate come ipotesi), "suggestions": string[] (azioni pratiche), "see_vet": string|null (quando rivolgersi al veterinario, se pertinente), "missing_data": string[] (dati che servirebbero)}. Usa array vuoti se non pertinenti.`,
+    system: `Sei il coordinatore di LILLA APP AI. Unisci le note degli specialisti in UNA risposta per la famiglia.\n${rules}\nRispondi SOLO con JSON con queste chiavi: {"summary": string (2-4 frasi), "verified": string[] (fatti presenti nei dati, con numeri/date), "hypotheses": string[] (interpretazioni possibili, formulate come ipotesi), "suggestions": string[] (azioni pratiche), "see_vet": string|null (quando rivolgersi al veterinario, se pertinente), "missing_data": string[] (dati che servirebbero)}. Usa array vuoti se non pertinenti.`,
     parts: [{ text: `Richiesta: ${question}\n\nNote degli specialisti:\n${notes.join('\n\n')}` }],
     json: true,
     temperature: 0.2,

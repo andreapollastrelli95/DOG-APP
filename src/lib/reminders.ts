@@ -29,7 +29,7 @@ export function useReminders() {
           const when = new Date(a.starts_at).toLocaleString('it-IT', { timeZone: 'Europe/Rome', dateStyle: 'short', timeStyle: 'short' })
           toast(`Promemoria: ${a.title} (${when})`)
           try {
-            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') new Notification('DOG MANAGER', { body: `${a.title} — ${when}`, icon: '/icon-192.png' })
+            if (typeof Notification !== 'undefined' && Notification.permission === 'granted') new Notification('LILLA APP', { body: `${a.title} — ${when}`, icon: '/icon-192.png' })
           } catch {
             /* notifica non disponibile */
           }

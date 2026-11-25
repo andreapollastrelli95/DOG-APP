@@ -16,7 +16,7 @@ export const NAV = [
   { to: '/archivio', label: 'Archivio', icon: Folder },
   { to: '/luoghi', label: 'Luoghi', icon: MapPin },
   { to: '/analisi', label: 'Analisi e report', icon: LineChart },
-  { to: '/ai', label: 'DOG MANAGER AI', icon: Bot },
+  { to: '/ai', label: 'LILLA APP AI', icon: Bot },
   { to: '/profilo', label: 'Profilo cagnolina', icon: PawPrint },
   { to: '/impostazioni', label: 'Impostazioni', icon: Settings },
 ]
@@ -68,7 +68,7 @@ export function Layout() {
           <div className="grid size-10 place-items-center rounded-xl bg-primary text-primary-fg">
             <PawPrint size={22} />
           </div>
-          <span className="font-display text-lg tracking-wide">DOG MANAGER</span>
+          <span className="font-display text-lg tracking-wide">LILLA APP</span>
         </div>
         <nav className="flex-1 space-y-0.5 overflow-y-auto">
           {NAV.map((n) => (
@@ -94,7 +94,7 @@ export function Layout() {
         )}
         <header className="flex items-center justify-between gap-2 border-b border-line bg-surface px-4 py-2 safe-top md:justify-end">
           <span className="flex items-center gap-2 font-display text-lg md:hidden">
-            <PawPrint size={20} className="text-primary" /> DOG MANAGER
+            <PawPrint size={20} className="text-primary" /> LILLA APP
           </span>
           <div className="flex items-center gap-2">
             <SyncBadge />
@@ -114,7 +114,7 @@ export function Layout() {
         {NAV.filter((n) => BOTTOM.includes(n.to)).map((n) => (
           <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cx('flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px]', isActive ? 'text-primary' : 'text-muted')}>
             <n.icon size={21} />
-            {n.label === 'DOG MANAGER AI' ? 'AI' : n.label}
+            {n.label === 'LILLA APP AI' ? 'AI' : n.label}
           </NavLink>
         ))}
         <button onClick={() => setMore(true)} className="flex min-h-14 flex-col items-center justify-center gap-0.5 text-[11px] text-muted">

@@ -25,6 +25,12 @@ Comandi: `node tests/cloud-check.mjs` (14 controlli sul backend Supabase) e `nod
 - Edge Function `ai-chat` distribuita: risponde con AI configurata, rifiuta chi non è loggato. `invite` distribuita: rifiuta un estraneo.
 - App pubblicata su Cloudflare Pages: login reale, creazione famiglia, nessun errore JS.
 
+## LILLA APP: tema, nome e album (25/11/2026)
+- Tema lilla (chiaro predefinito), nome e icone aggiornati. L'indirizzo resta `dog-app.pages.dev` (è sul volantino stampato).
+- Album foto in Home, provato su Supabase reale (`tests/e2e/gallery-live.mjs`, 9 controlli): caricamento multiplo, Storage privato, ricarica, ingrandimento, eliminazione anche del file. Provato su Edge a 390 px, non su iPhone.
+- `npm test`: 21 su 22; il test con Gemini reale è andato in timeout (servizio lento).
+- La suite locale `tests/e2e/smoke.mjs` non è stata rieseguita dopo le modifiche.
+
 ## NON verificato (scritto ma mai eseguito)
 1. **Invio reale di un invito email** e accettazione da parte di un secondo utente (`invite` provata solo nel rifiuto dell'estraneo); `claim_invites`, `remove_member`, `delete_household_data`, `delete_my_account` come flusso completo.
 2. **Registrazione con email di conferma, recupero password**: non provati (l'email gratuita di Supabase è limitata a poche all'ora).

@@ -1,4 +1,4 @@
-DOG MANAGER — CONFIGURAZIONE (database, AI, servizi esterni)
+LILLA APP — CONFIGURAZIONE (database, AI, servizi esterni)
 =============================================================
 
 NESSUNA chiave va scritta nel codice, nel repository o nel frontend.

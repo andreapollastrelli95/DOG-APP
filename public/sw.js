@@ -1,5 +1,5 @@
 // Service worker: cache dell'app (shell + risorse) per l'uso offline. Non mette in cache le API né i dati (restano in IndexedDB).
-const VERSION = 'dm-v1'
+const VERSION = 'dm-v2'
 const SHELL = ['/', '/manifest.webmanifest', '/icon.svg', '/icon-192.png', '/icon-512.png', '/apple-touch-icon.png']
 
 self.addEventListener('install', (e) => {

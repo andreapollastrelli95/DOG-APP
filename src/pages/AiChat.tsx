@@ -75,7 +75,7 @@ export default function AiChat() {
   return (
     <div className="grid gap-4 lg:grid-cols-[16rem_1fr]">
       <div className="space-y-2">
-        <h1 className="font-display text-2xl">DOG MANAGER AI</h1>
+        <h1 className="font-display text-2xl">LILLA APP AI</h1>
         <Button variant="soft" className="w-full" onClick={() => setActive(null)}>
           <Plus size={16} /> Nuova conversazione
         </Button>
