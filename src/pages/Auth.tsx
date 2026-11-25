@@ -1,5 +1,4 @@
 import { useState } from 'react'
-import { PawPrint } from 'lucide-react'
 import { supabase } from '../lib/supabase'
 import { Button, Card, inputCls } from '../components/ui'
 
@@ -42,9 +41,7 @@ export function AuthScreen({ onDemo }: { onDemo: () => void }) {
     <div className="grid min-h-full place-items-center bg-bg p-4">
       <Card className="w-full max-w-sm p-6">
         <div className="mb-5 flex items-center gap-3">
-          <div className="grid size-12 place-items-center rounded-2xl bg-primary text-primary-fg">
-            <PawPrint />
-          </div>
+          <img src="/icon.svg" alt="" className="size-12 rounded-2xl border border-line" />
           <div>
             <h1 className="font-display text-2xl leading-none">LILLA APP</h1>
             <p className="text-xs text-muted">Il fascicolo digitale della nostra cagnolina</p>

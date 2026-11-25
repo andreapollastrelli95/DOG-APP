@@ -3,7 +3,7 @@
 import { chromium } from 'playwright-core'
 import { readFileSync } from 'node:fs'
 const env = Object.fromEntries(readFileSync('.env.local', 'utf8').split(/\r?\n/).filter((l) => l.includes('=')).map((l) => [l.slice(0, l.indexOf('=')), l.slice(l.indexOf('=') + 1).trim()]))
-const BASE = process.env.BASE ?? 'https://dog-app.pages.dev'
+const BASE = process.env.BASE ?? 'https://lilla-app.pages.dev'
 const SHOTS = process.env.SHOTS
 const ref = env.SUPABASE_PROJECT_REF, url = `https://${ref}.supabase.co`
 const mgmt = { Authorization: `Bearer ${env.SUPABASE_ACCESS_TOKEN}`, 'Content-Type': 'application/json' }
@@ -29,25 +29,47 @@ try {
   await page.getByRole('button', { name: 'Crea famiglia' }).click()
   await page.getByText('Album foto').waitFor({ timeout: 20000 })
   check('la Home mostra l\'album', true)
-  const files = ['volantino/foto-cagnolina.png', 'public/icon-512.png'].map((f) => f)
-  await page.getByLabel('Scegli foto').setInputFiles(files)
-  await page.waitForFunction(() => document.querySelectorAll('img[alt="foto-cagnolina"], img[alt="icon-512"]').length === 2, null, { timeout: 30000 })
-  await page.waitForFunction(() => [...document.querySelectorAll('img[alt="foto-cagnolina"], img[alt="icon-512"]')].every((i) => i.complete && i.naturalWidth > 0), null, { timeout: 20000 })
-  check('due foto caricate e visibili', true)
-  check('due file nello Storage privato', (await objects()) === 2)
+  // 7 foto: la griglia mostra 6 elementi per pagina
+  const png = readFileSync('public/icon-192.png')
+  await page.getByLabel('Scegli foto o video').setInputFiles(Array.from({ length: 7 }, (_, k) => ({ name: `prova-${k + 1}.png`, mimeType: 'image/png', buffer: png })))
+  const pos = page.getByTestId('posizione-album')
+  await page.waitForFunction(() => document.querySelector('[data-testid="posizione-album"]')?.textContent === '1 di 7', null, { timeout: 60000 })
+  check('sette foto caricate', true)
+  check('sette file nello Storage privato', (await objects()) === 7)
+  const big = page.locator('img[alt^="prova-"]').first()
+  await big.waitFor({ timeout: 20000 })
   if (SHOTS) await page.screenshot({ path: SHOTS + '/album.png' })
-  await page.reload({ waitUntil: 'networkidle' })
-  await page.locator('img[alt="foto-cagnolina"]').waitFor({ timeout: 20000 })
-  check('foto presenti dopo ricarica', true)
-  await page.getByRole('button', { name: 'Apri foto foto-cagnolina' }).click()
-  check('foto ingrandita', await page.getByRole('button', { name: 'Avanti' }).isVisible())
-  await page.keyboard.press('Escape')
-  await page.getByRole('button', { name: 'Elimina foto icon-512' }).click()
+  await page.getByRole('button', { name: 'Successiva', exact: true }).click()
+  check('freccia destra: foto successiva', (await pos.textContent()) === '2 di 7')
+  await page.getByRole('button', { name: 'Precedente', exact: true }).click()
+  check('freccia sinistra: foto precedente', (await pos.textContent()) === '1 di 7')
+  await page.getByRole('button', { name: 'Griglia' }).click()
+  check('griglia: 6 elementi nella prima pagina', (await page.getByTestId('cella-album').count()) === 6)
+  if (SHOTS) await page.screenshot({ path: SHOTS + '/griglia.png', fullPage: true })
+  await page.getByRole('button', { name: 'Successive' }).click()
+  check('seconda pagina: 1 elemento', (await page.getByTestId('cella-album').count()) === 1)
+  await page.getByRole('button', { name: /^Elimina prova-/ }).click()
   await page.getByRole('button', { name: 'Elimina', exact: true }).last().click()
-  await page.waitForFunction(() => !document.querySelector('img[alt="icon-512"]'), null, { timeout: 20000 })
-  check('foto eliminata dalla Home', true)
+  await page.waitForFunction(() => document.querySelectorAll('[data-testid="cella-album"]').length === 6, null, { timeout: 20000 })
+  check('eliminazione dalla griglia', true)
   await page.waitForTimeout(1500)
-  check('file eliminato anche dallo Storage', (await objects()) === 1)
+  check('file eliminato anche dallo Storage', (await objects()) === 6)
+  await page.reload({ waitUntil: 'networkidle' })
+  await page.waitForFunction(() => document.querySelector('[data-testid="posizione-album"]')?.textContent === '1 di 6', null, { timeout: 30000 })
+  check('foto presenti dopo ricarica', true)
+  if (process.env.VIDEO) {
+    await page.getByLabel('Scegli foto o video').setInputFiles(process.env.VIDEO)
+    await page.waitForFunction(() => document.querySelector('[data-testid="posizione-album"]')?.textContent === '1 di 7', null, { timeout: 60000 })
+    await page.waitForFunction(() => document.querySelector('video')?.readyState >= 2, null, { timeout: 30000 })
+    const t = await page.evaluate(async () => {
+      const v = document.querySelector('video')
+      v.muted = true
+      await v.play()
+      await new Promise((r) => setTimeout(r, 1500))
+      return v.currentTime
+    })
+    check('video caricato e riprodotto', t > 0.5, 'tempo ' + t)
+  }
   const wide = await page.evaluate(() => document.documentElement.scrollWidth <= window.innerWidth)
   check('nessuno scorrimento orizzontale della pagina a 390 px', wide)
   check('nessun errore JS', errs.length === 0, errs.join(' | ').slice(0, 200))

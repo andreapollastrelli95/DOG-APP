@@ -1,14 +1,16 @@
 import { useEffect, useMemo, useRef, useState } from 'react'
-import { ChevronLeft, ChevronRight, ImagePlus, Images, Trash2 } from 'lucide-react'
+import { ChevronLeft, ChevronRight, ImagePlus, Images, LayoutGrid, Play, Square, Trash2 } from 'lucide-react'
 import { useApp, useTable } from '../lib/app'
 import { uuid } from '../lib/store'
 import { supabase } from '../lib/supabase'
-import { todayInput } from '../lib/format'
+import { fmtDate, todayInput } from '../lib/format'
 import type { Row } from '../lib/schema'
-import { Button, Card, Modal, useUi } from './ui'
+import { Button, Card, useUi } from './ui'
 
 const MAX = 25 * 1024 * 1024
-const isPhoto = (d: Row) => String(d.mime ?? '').startsWith('image/') && (d.category === 'foto' || d.category === 'ricordo')
+const PER_PAGE = 6
+const isVideo = (d: Row) => String(d.mime ?? '').startsWith('video/')
+const isMedia = (d: Row) => (String(d.mime ?? '').startsWith('image/') || isVideo(d)) && ['foto', 'video', 'ricordo'].includes(d.category)
 
 /** Riduce la foto (lato lungo 1600 px) per risparmiare spazio; se il formato non è leggibile resta l'originale. */
 async function shrink(file: File): Promise<Blob> {
@@ -29,66 +31,80 @@ async function shrink(file: File): Promise<Blob> {
   }
 }
 
-/** Indirizzi temporanei delle foto: URL firmati in cloud, blob locali altrimenti. */
-function usePhotoUrls(photos: Row[]) {
+/** Indirizzi temporanei solo per gli elementi visibili: URL firmati in cloud, blob locali altrimenti. */
+function useMediaUrls(items: Row[]) {
   const { store } = useApp()
   const [urls, setUrls] = useState<Record<string, string>>({})
-  const key = photos.map((p) => p.id).join(',')
+  const cache = useRef<Record<string, string>>({})
+  const key = items.map((p) => p.id).join(',')
   useEffect(() => {
     let alive = true
-    const local: string[] = []
     ;(async () => {
-      const next: Record<string, string> = {}
-      if (store.mode === 'cloud' && supabase) {
-        if (photos.length) {
-          const { data } = await supabase.storage.from('documents').createSignedUrls(photos.map((p) => p.storage_path), 3600)
+      const missing = items.filter((p) => !cache.current[p.id])
+      if (missing.length) {
+        if (store.mode === 'cloud' && supabase) {
+          const { data } = await supabase.storage.from('documents').createSignedUrls(missing.map((p) => p.storage_path), 3600)
           data?.forEach((d, i) => {
-            if (d.signedUrl) next[photos[i].id] = d.signedUrl
+            if (d.signedUrl) cache.current[missing[i].id] = d.signedUrl
           })
-        }
-      } else {
-        for (const p of photos) {
-          const b = await store.getBlob(p.id)
-          if (b) local.push((next[p.id] = URL.createObjectURL(b)))
+        } else {
+          for (const p of missing) {
+            const b = await store.getBlob(p.id)
+            if (b) cache.current[p.id] = URL.createObjectURL(b)
+          }
         }
       }
-      if (alive) setUrls(next)
-      else local.forEach((u) => URL.revokeObjectURL(u))
+      if (alive) setUrls({ ...cache.current })
     })().catch(() => undefined)
     return () => {
       alive = false
-      local.forEach((u) => URL.revokeObjectURL(u))
     }
   }, [store, key])
+  useEffect(
+    () => () => {
+      Object.values(cache.current).forEach((u) => u.startsWith('blob:') && URL.revokeObjectURL(u))
+      cache.current = {}
+    },
+    [store],
+  )
   return urls
 }
+
+const arrow = 'absolute top-1/2 grid size-11 -translate-y-1/2 place-items-center rounded-full bg-black/55 text-white'
 
 export function PhotoGallery() {
   const { store } = useApp()
   const { toast, confirm } = useUi()
   const { rows } = useTable('documents')
-  const photos = useMemo(() => rows.filter(isPhoto).sort((a, b) => String(b.created_at).localeCompare(String(a.created_at))), [rows])
-  const urls = usePhotoUrls(photos)
-  const [open, setOpen] = useState<number | null>(null)
-  const [busy, setBusy] = useState(false)
+  const media = useMemo(() => rows.filter(isMedia).sort((a, b) => String(b.date ?? '').localeCompare(String(a.date ?? '')) || String(b.created_at).localeCompare(String(a.created_at))), [rows])
+  const [grid, setGrid] = useState(false)
+  const [index, setIndex] = useState(0)
+  const [busy, setBusy] = useState('')
   const picker = useRef<HTMLInputElement>(null)
-  const strip = useRef<HTMLDivElement>(null)
-  const current = open === null ? null : photos[Math.min(open, photos.length - 1)]
+  const touch = useRef<number | null>(null)
 
-  const step = (n: number) => setOpen((i) => (i === null ? i : (i + n + photos.length) % photos.length))
-  const scroll = (n: number) => strip.current?.scrollBy({ left: n * strip.current.clientWidth * 0.8, behavior: 'smooth' })
+  const i = Math.max(0, Math.min(index, media.length - 1))
+  const page = Math.floor(i / PER_PAGE)
+  const pages = Math.ceil(media.length / PER_PAGE)
+  const current = media[i]
+  const visible = grid ? media.slice(page * PER_PAGE, page * PER_PAGE + PER_PAGE) : media.length ? [current, media[(i + 1) % media.length]] : []
+  const urls = useMediaUrls(visible)
+
+  const step = (n: number) => setIndex((i + n + media.length) % media.length)
+  const turn = (n: number) => setIndex(((page + n + pages) % pages) * PER_PAGE)
 
   async function add(files: File[]) {
     if (!files.length) return
-    setBusy(true)
     let saved = 0
     try {
-      for (const file of files) {
-        if (!file.type.startsWith('image/')) {
-          toast(`${file.name}: non è una foto`, 'err')
+      for (const [k, file] of files.entries()) {
+        setBusy(files.length > 1 ? `Carico ${k + 1}/${files.length}…` : 'Carico…')
+        const video = file.type.startsWith('video/')
+        if (!video && !file.type.startsWith('image/')) {
+          toast(`${file.name}: non è una foto né un video`, 'err')
           continue
         }
-        const blob = await shrink(file)
+        const blob = video ? file : await shrink(file)
         if (blob.size > MAX) {
           toast(`${file.name}: troppo grande (massimo 25 MB)`, 'err')
           continue
@@ -97,65 +113,69 @@ export function PhotoGallery() {
         const path = `${store.householdId}/${id}`
         const mime = blob.type || file.type
         if (store.mode === 'cloud') {
-          if (!navigator.onLine || !supabase) throw new Error('Per caricare le foto serve la connessione.')
+          if (!navigator.onLine || !supabase) throw new Error('Per caricare foto e video serve la connessione.')
           const { error } = await supabase.storage.from('documents').upload(path, blob, { contentType: mime })
           if (error) throw error
         } else await store.putBlob(id, blob)
-        await store.insert('documents', { id, title: file.name.replace(/\.[^.]+$/, '') || 'Foto', category: 'foto', date: todayInput(), tags: [], notes: null, file_name: file.name, mime, size_bytes: blob.size, storage_path: path })
+        await store.insert('documents', { id, title: file.name.replace(/\.[^.]+$/, '') || (video ? 'Video' : 'Foto'), category: video ? 'video' : 'foto', date: todayInput(), tags: [], notes: null, file_name: file.name, mime, size_bytes: blob.size, storage_path: path })
         saved++
       }
-      if (saved) toast(saved === 1 ? 'Foto aggiunta' : `${saved} foto aggiunte`)
+      if (saved) {
+        setIndex(0)
+        toast(saved === 1 ? 'Aggiunto all’album' : `${saved} elementi aggiunti`)
+      }
     } catch (e: any) {
       toast(e?.message ?? 'Caricamento non riuscito', 'err')
     } finally {
-      setBusy(false)
+      setBusy('')
     }
   }
 
   async function remove(d: Row) {
-    if (!(await confirm(`Eliminare definitivamente la foto “${d.title}”?`))) return
+    if (!(await confirm(`Eliminare definitivamente ${isVideo(d) ? 'il video' : 'la foto'} “${d.title}”?`))) return
     try {
       if (store.mode === 'cloud') {
-        if (!navigator.onLine || !supabase) throw new Error('Per eliminare le foto serve la connessione.')
+        if (!navigator.onLine || !supabase) throw new Error('Per eliminare serve la connessione.')
         const { error } = await supabase.storage.from('documents').remove([d.storage_path])
         if (error) throw error
       } else await store.deleteBlob(d.id)
       await store.remove('documents', d.id)
-      setOpen(null)
-      toast('Foto eliminata')
+      toast('Eliminato')
     } catch (e: any) {
       toast(e?.message ?? 'Eliminazione non riuscita', 'err')
     }
   }
 
+  const trash = (d: Row) => (
+    <button onClick={() => void remove(d)} aria-label={`Elimina ${d.title}`} className="absolute right-2 top-2 grid size-9 place-items-center rounded-full bg-black/55 text-white">
+      <Trash2 size={16} />
+    </button>
+  )
+
   return (
     <Card>
-      <div className="mb-3 flex items-center justify-between gap-2">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-2">
         <h2 className="flex items-center gap-2 font-medium">
           <Images size={18} className="text-primary" /> Album foto
+          {media.length > 0 && <span className="text-xs text-muted">({media.length})</span>}
         </h2>
-        <div className="flex items-center gap-1">
-          {photos.length > 1 && (
-            <span className="hidden gap-1 sm:flex">
-              <button aria-label="Foto precedenti" onClick={() => scroll(-1)} className="grid size-9 place-items-center rounded-full bg-surface2 text-primary">
-                <ChevronLeft size={18} />
-              </button>
-              <button aria-label="Foto successive" onClick={() => scroll(1)} className="grid size-9 place-items-center rounded-full bg-surface2 text-primary">
-                <ChevronRight size={18} />
-              </button>
-            </span>
+        <div className="flex items-center gap-2">
+          {media.length > 1 && (
+            <Button size="sm" variant="soft" onClick={() => setGrid(!grid)}>
+              {grid ? <Square size={16} /> : <LayoutGrid size={16} />} {grid ? 'Foto grande' : 'Griglia'}
+            </Button>
           )}
-          <Button size="sm" disabled={busy} onClick={() => picker.current?.click()}>
-            <ImagePlus size={16} /> {busy ? 'Carico…' : 'Aggiungi foto'}
+          <Button size="sm" disabled={!!busy} onClick={() => picker.current?.click()}>
+            <ImagePlus size={16} /> {busy || 'Aggiungi'}
           </Button>
         </div>
         <input
           ref={picker}
           type="file"
-          accept="image/*"
+          accept="image/*,video/*"
           multiple
           className="sr-only"
-          aria-label="Scegli foto"
+          aria-label="Scegli foto o video"
           onChange={(e) => {
             const files = [...(e.target.files ?? [])]
             e.target.value = ''
@@ -164,42 +184,87 @@ export function PhotoGallery() {
         />
       </div>
 
-      {!photos.length ? (
-        <p className="text-sm text-muted">Ancora nessuna foto. Tocca “Aggiungi foto” per iniziare l'album.</p>
-      ) : (
-        <div ref={strip} className="flex snap-x snap-mandatory gap-3 overflow-x-auto pb-2">
-          {photos.map((p, i) => (
-            <div key={p.id} className="relative shrink-0 snap-center">
-              <button onClick={() => setOpen(i)} aria-label={`Apri foto ${p.title}`} className="block h-64 w-52 overflow-hidden rounded-2xl border border-line bg-surface2">
-                {urls[p.id] ? <img src={urls[p.id]} alt={p.title} loading="lazy" className="size-full object-cover" /> : <span className="grid size-full place-items-center px-2 text-xs text-muted">{p.title}</span>}
-              </button>
-              <button onClick={() => void remove(p)} aria-label={`Elimina foto ${p.title}`} className="absolute right-2 top-2 grid size-9 place-items-center rounded-full bg-black/55 text-white">
-                <Trash2 size={16} />
-              </button>
-            </div>
-          ))}
-        </div>
-      )}
-
-      {current && (
-        <Modal title={current.title} onClose={() => setOpen(null)} wide>
-          {urls[current.id] ? <img src={urls[current.id]} alt={current.title} className="max-h-[65vh] w-full rounded-xl object-contain" /> : <p className="py-10 text-center text-sm text-muted">Foto non disponibile senza connessione.</p>}
-          <div className="mt-3 flex items-center justify-between gap-2">
-            <Button variant="danger" onClick={() => void remove(current)}>
-              <Trash2 size={16} /> Elimina
-            </Button>
-            {photos.length > 1 && (
-              <div className="flex gap-2">
-                <Button variant="soft" onClick={() => step(-1)}>
-                  <ChevronLeft size={16} /> Indietro
-                </Button>
-                <Button variant="soft" onClick={() => step(1)}>
-                  Avanti <ChevronRight size={16} />
-                </Button>
+      {!media.length ? (
+        <p className="text-sm text-muted">Ancora nessuna foto. Tocca “Aggiungi” per caricare foto o video.</p>
+      ) : grid ? (
+        <>
+          <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+            {visible.map((p, k) => (
+              <div key={p.id} className="relative">
+                <button
+                  onClick={() => {
+                    setIndex(page * PER_PAGE + k)
+                    setGrid(false)
+                  }}
+                  aria-label={`Apri ${p.title}`}
+                  data-testid="cella-album"
+                  className="relative block aspect-square w-full overflow-hidden rounded-xl bg-surface2"
+                >
+                  {urls[p.id] && (isVideo(p) ? <video src={urls[p.id] + '#t=0.1'} preload="metadata" muted playsInline className="size-full object-cover" /> : <img src={urls[p.id]} alt={p.title} className="size-full object-cover" />)}
+                  {isVideo(p) && (
+                    <span className="absolute inset-0 grid place-items-center">
+                      <span className="grid size-11 place-items-center rounded-full bg-black/55 text-white">
+                        <Play size={20} />
+                      </span>
+                    </span>
+                  )}
+                </button>
+                {trash(p)}
               </div>
-            )}
+            ))}
           </div>
-        </Modal>
+          {pages > 1 && (
+            <div className="mt-3 flex items-center justify-between gap-2 text-sm">
+              <Button size="sm" variant="soft" onClick={() => turn(-1)}>
+                <ChevronLeft size={16} /> Precedenti
+              </Button>
+              <span className="text-muted">
+                Pagina {page + 1} di {pages}
+              </span>
+              <Button size="sm" variant="soft" onClick={() => turn(1)}>
+                Successive <ChevronRight size={16} />
+              </Button>
+            </div>
+          )}
+        </>
+      ) : (
+        <>
+          <div
+            className="relative h-[55vh] max-h-[32rem] min-h-64 overflow-hidden rounded-2xl bg-surface2"
+            onTouchStart={(e) => (touch.current = e.touches[0].clientX)}
+            onTouchEnd={(e) => {
+              if (touch.current === null) return
+              const dx = e.changedTouches[0].clientX - touch.current
+              touch.current = null
+              if (Math.abs(dx) > 50 && media.length > 1) step(dx < 0 ? 1 : -1)
+            }}
+          >
+            {!urls[current.id] ? (
+              <span className="grid size-full place-items-center text-sm text-muted">Carico…</span>
+            ) : isVideo(current) ? (
+              <video key={current.id} src={urls[current.id] + '#t=0.1'} controls playsInline preload="metadata" className="size-full object-contain" />
+            ) : (
+              <img src={urls[current.id]} alt={current.title} className="size-full object-contain" />
+            )}
+            {media.length > 1 && (
+              <>
+                <button aria-label="Precedente" onClick={() => step(-1)} className={arrow + ' left-2'}>
+                  <ChevronLeft size={22} />
+                </button>
+                <button aria-label="Successiva" onClick={() => step(1)} className={arrow + ' right-2'}>
+                  <ChevronRight size={22} />
+                </button>
+              </>
+            )}
+            {trash(current)}
+          </div>
+          <p className="mt-2 flex justify-between text-xs text-muted">
+            <span>{fmtDate(current.date)}</span>
+            <span data-testid="posizione-album">
+              {i + 1} di {media.length}
+            </span>
+          </p>
+        </>
       )}
     </Card>
   )

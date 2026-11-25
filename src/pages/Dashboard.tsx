@@ -1,6 +1,6 @@
 import { useMemo, useState } from 'react'
 import { Link, useNavigate } from 'react-router-dom'
-import { Activity, AlertTriangle, Bot, Calendar, CheckCircle2, FileUp, HeartPulse, PawPrint, Plus, Scale, Syringe, Utensils, Wallet } from 'lucide-react'
+import { Activity, AlertTriangle, Bot, Calendar, CalendarPlus, CheckCircle2, FileUp, Folder, LineChart, MapPin, Receipt, Smile, HeartPulse, PawPrint, Plus, Scale, Syringe, Utensils, Wallet } from 'lucide-react'
 import { useTables } from '../lib/app'
 import { analyze, ageText, dayKey, runOutDate } from '../lib/analysis'
 import { eur, fmtDate, fmtDateTime, num, relativeDay } from '../lib/format'
@@ -9,13 +9,26 @@ import { ResourceDialog } from '../components/Resource'
 import { useApp } from '../lib/app'
 import { PhotoGallery } from '../components/Gallery'
 
-const QUICK = [
+// azioni principali (in evidenza) e secondarie
+const MAIN = [
+  { label: 'Carica documento', to: '/archivio?nuovo=1', icon: FileUp },
+  { label: 'Agenda', to: '/agenda', icon: Calendar },
+  { label: 'Aggiungi evento', table: 'appointments', icon: CalendarPlus },
+  { label: 'Spese', to: '/spese', icon: Wallet },
+  { label: 'Registra spesa', table: 'expenses', icon: Receipt },
+  { label: 'Archivio', to: '/archivio', icon: Folder },
+  { label: 'Analisi e report', to: '/analisi', icon: LineChart },
+  { label: 'Luoghi', to: '/luoghi', icon: MapPin },
+]
+const SECONDARY = [
+  { label: 'Alimentazione', to: '/alimentazione', icon: Utensils },
+  { label: 'Attività', to: '/attivita', icon: Activity },
+  { label: 'Benessere', to: '/benessere', icon: Smile },
   { label: 'Registra pasto', table: 'meals', icon: Utensils },
   { label: 'Registra passeggiata', table: 'activities', icon: Activity, defaults: { kind: 'passeggiata' } },
   { label: 'Registra peso', table: 'weights', icon: Scale },
-  { label: 'Registra spesa', table: 'expenses', icon: Wallet },
-  { label: 'Aggiungi evento', table: 'appointments', icon: Calendar },
 ]
+type Action = { label: string; icon: typeof Bot; to?: string; table?: string; defaults?: Record<string, any> }
 
 export default function Dashboard() {
   const nav = useNavigate()
@@ -23,6 +36,7 @@ export default function Dashboard() {
   const { data, loading } = useTables(['dogs', 'weights', 'meals', 'activities', 'appointments', 'health_records', 'expenses', 'budgets', 'behavior_logs', 'food_products'])
   const [dialog, setDialog] = useState<{ table: string; defaults?: Record<string, any> } | null>(null)
   const now = new Date()
+  const run = (q: { to?: string; table?: string; defaults?: Record<string, any> }) => (q.to ? nav(q.to) : setDialog({ table: q.table!, defaults: q.defaults }))
 
   const v = useMemo(() => {
     if (loading) return null
@@ -83,17 +97,13 @@ export default function Dashboard() {
       <PhotoGallery />
 
 
-      <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-5">
-        {QUICK.map((q) => (
-          <button key={q.label} onClick={() => setDialog({ table: q.table, defaults: q.defaults })} className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line bg-surface p-2 text-center text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-surface2">
+      <div className="grid grid-cols-3 gap-2 lg:grid-cols-9">
+        {(MAIN as Action[]).map((q) => (
+          <button key={q.label} onClick={() => run(q)} className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line bg-surface p-2 text-center text-xs font-semibold uppercase tracking-wide text-primary transition hover:bg-surface2">
             <q.icon size={22} />
             {q.label}
           </button>
         ))}
-        <button onClick={() => nav('/archivio?nuovo=1')} className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl border border-line bg-surface p-2 text-center text-xs font-semibold uppercase tracking-wide text-primary hover:bg-surface2">
-          <FileUp size={22} />
-          Carica documento
-        </button>
         <button onClick={() => nav('/ai')} className="flex min-h-20 flex-col items-center justify-center gap-1.5 rounded-2xl bg-primary p-2 text-center text-xs font-semibold uppercase tracking-wide text-primary-fg hover:opacity-90">
           <Bot size={22} />
           Chiedi all'AI
@@ -122,13 +132,6 @@ export default function Dashboard() {
           </ul>
         </Card>
       )}
-
-      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <Stat label="Ultimo peso" icon={<Scale size={14} />} value={v.weights[0] ? `${num(v.weights[0].weight_kg)} kg` : '—'} sub={v.weights[0] ? fmtDate(v.weights[0].date) : 'Nessuna pesata'} />
-        <Stat label="Ultima passeggiata" icon={<Activity size={14} />} value={v.walks[0] ? relativeDay(v.walks[0].at) : '—'} sub={v.walks[0] ? `${v.walks[0].duration_min} min${v.walks[0].distance_km ? ` · ${num(v.walks[0].distance_km)} km` : ''}` : 'Nessuna registrata'} />
-        <Stat label="Prossimo pasto" icon={<Utensils size={14} />} value={v.nextMeal ? relativeDay(v.nextMeal.starts_at) : '—'} sub={v.nextMeal ? fmtDateTime(v.nextMeal.starts_at) : v.meals[0] ? `Ultimo: ${fmtDateTime(v.meals[0].at)}` : 'Nessun pasto programmato'} />
-        <Stat label="Prossima visita" icon={<HeartPulse size={14} />} value={v.nextVet ? relativeDay(v.nextVet.starts_at) : '—'} sub={v.nextVet ? `${v.nextVet.title} · ${fmtDateTime(v.nextVet.starts_at)}` : 'Nessuna in agenda'} />
-      </div>
 
       <div className="grid gap-3 lg:grid-cols-3">
         <Card>
@@ -189,6 +192,25 @@ export default function Dashboard() {
             <p className="mt-1 text-xs text-muted">Nessun budget mensile impostato.</p>
           )}
         </Card>
+      </div>
+
+      <div className="space-y-2">
+        <h2 className="text-xs font-semibold uppercase tracking-wider text-muted">Pappa, attività e benessere</h2>
+        <div className="flex flex-wrap gap-2">
+          {(SECONDARY as Action[]).map((q) => (
+            <button key={q.label} onClick={() => run(q)} className="flex min-h-10 items-center gap-2 rounded-full border border-line bg-surface px-3 text-xs text-muted hover:bg-surface2">
+              <q.icon size={15} />
+              {q.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+        <Stat label="Ultimo peso" icon={<Scale size={14} />} value={v.weights[0] ? `${num(v.weights[0].weight_kg)} kg` : '—'} sub={v.weights[0] ? fmtDate(v.weights[0].date) : 'Nessuna pesata'} />
+        <Stat label="Ultima passeggiata" icon={<Activity size={14} />} value={v.walks[0] ? relativeDay(v.walks[0].at) : '—'} sub={v.walks[0] ? `${v.walks[0].duration_min} min${v.walks[0].distance_km ? ` · ${num(v.walks[0].distance_km)} km` : ''}` : 'Nessuna registrata'} />
+        <Stat label="Prossimo pasto" icon={<Utensils size={14} />} value={v.nextMeal ? relativeDay(v.nextMeal.starts_at) : '—'} sub={v.nextMeal ? fmtDateTime(v.nextMeal.starts_at) : v.meals[0] ? `Ultimo: ${fmtDateTime(v.meals[0].at)}` : 'Nessun pasto programmato'} />
+        <Stat label="Prossima visita" icon={<HeartPulse size={14} />} value={v.nextVet ? relativeDay(v.nextVet.starts_at) : '—'} sub={v.nextVet ? `${v.nextVet.title} · ${fmtDateTime(v.nextVet.starts_at)}` : 'Nessuna in agenda'} />
       </div>
 
       <Card>

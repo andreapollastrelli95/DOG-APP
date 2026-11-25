@@ -53,7 +53,7 @@ function Thumb({ doc }: { doc: Row }) {
   const { store } = useApp()
   const isImg = doc.mime?.startsWith('image/')
   const url = useDocUrl(store, isImg ? doc : null)
-  return <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-surface2 text-muted">{url ? <img src={url} alt="" className="size-full object-cover" /> : <FileIcon size={22} />}</div>
+  return <div className="grid size-14 shrink-0 place-items-center overflow-hidden rounded-xl bg-surface2 text-muted">{url ? <img src={url} alt="" loading="lazy" className="size-full object-cover" /> : <FileIcon size={22} />}</div>
 }
 
 function UploadDialog({ onClose, initialFile }: { onClose: () => void; initialFile?: File | null }) {
@@ -156,6 +156,7 @@ export default function Documents() {
   const [adding, setAdding] = useState(params.get('nuovo') === '1')
   const [q, setQ] = useState('')
   const [cat, setCat] = useState('')
+  const [limit, setLimit] = useState(30)
 
   const shown = useMemo(() => {
     const n = q.trim().toLowerCase()
@@ -223,7 +224,7 @@ export default function Documents() {
           <Empty>{rows.length ? 'Nessun risultato.' : 'Nessun documento. Carica il primo con “Carica”.'}</Empty>
         ) : (
           <ul className="grid gap-2 sm:grid-cols-2">
-            {shown.map((d) => (
+            {shown.slice(0, limit).map((d) => (
               <li key={d.id}>
                 <button onClick={() => setOpen(d)} className="flex w-full items-center gap-3 rounded-xl border border-line bg-bg p-2 text-left hover:bg-surface2">
                   <Thumb doc={d} />
@@ -242,6 +243,11 @@ export default function Documents() {
               </li>
             ))}
           </ul>
+        )}
+        {shown.length > limit && (
+          <Button variant="soft" className="mt-3 w-full" onClick={() => setLimit(limit + 30)}>
+            Mostra altri ({shown.length - limit})
+          </Button>
         )}
       </Card>
       {adding && (

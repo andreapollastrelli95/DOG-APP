@@ -1,9 +1,9 @@
 // Prova sull'app pubblicata: login reale, creazione famiglia, AI cloud. Utente di prova creato e poi eliminato.
-// Uso: BASE=https://dog-app.pages.dev node tests/e2e/cloud-live.mjs  (richiede .env.local)
+// Uso: BASE=https://lilla-app.pages.dev node tests/e2e/cloud-live.mjs  (richiede .env.local)
 import { chromium } from 'playwright-core'
 import { readFileSync } from 'node:fs'
 const env = Object.fromEntries(readFileSync('.env.local','utf8').split(/\r?\n/).filter(l=>l.includes('=')).map(l=>[l.slice(0,l.indexOf('=')), l.slice(l.indexOf('=')+1).trim()]))
-const BASE = process.env.BASE ?? 'https://dog-app.pages.dev'
+const BASE = process.env.BASE ?? 'https://lilla-app.pages.dev'
 const ref = env.SUPABASE_PROJECT_REF, url = `https://${ref}.supabase.co`
 const mg = await (await fetch(`https://api.supabase.com/v1/projects/${ref}/api-keys`, { headers:{Authorization:`Bearer ${env.SUPABASE_ACCESS_TOKEN}`} })).json()
 const svc = mg.find(k=>k.name==='service_role').api_key

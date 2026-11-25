@@ -17,7 +17,7 @@ Comando: `npm test` (22 test) e `npm run test:e2e` (55 controlli su Edge, modali
 - **AI reale (Gemini, modello gemini-3.1-flash-lite):** coordinatore → specialisti → risposta unica (verificato / ipotesi / suggerimenti / quando sentire il veterinario / dati mancanti); storico conversazioni; lettura scontrino da foto (importo 66,50 letto correttamente) con modulo di conferma e nulla salvato prima della conferma.
 - Coda offline e sincronizzazione cloud contro un **Supabase simulato in memoria**: accodamento, ordine, ritrasmissione senza duplicati, accorpamento di creazione+modifica (bug di perdita dati trovato e corretto dal test), conflitti, rifiuto del server, coda che sopravvive al riavvio.
 
-## Verificato sul cloud reale (24/11/2026) — app https://dog-app.pages.dev
+## Verificato sul cloud reale (24/11/2026) — app https://lilla-app.pages.dev
 Comandi: `node tests/cloud-check.mjs` (14 controlli sul backend Supabase) e `node tests/e2e/cloud-live.mjs` (6 controlli su Edge contro l'app pubblicata). Usano utenti di prova creati e poi eliminati.
 - Migrazione SQL eseguita su Supabase reale: 20 tabelle, tutte con RLS attiva.
 - `create_household`, inserimento con `created_by` impostato dal trigger, audit log scritto dal trigger e non falsificabile dal client.
@@ -26,8 +26,11 @@ Comandi: `node tests/cloud-check.mjs` (14 controlli sul backend Supabase) e `nod
 - App pubblicata su Cloudflare Pages: login reale, creazione famiglia, nessun errore JS.
 
 ## LILLA APP: tema, nome e album (25/11/2026)
-- Tema lilla (chiaro predefinito), nome e icone aggiornati. L'indirizzo resta `dog-app.pages.dev` (è sul volantino stampato).
-- Album foto in Home, provato su Supabase reale (`tests/e2e/gallery-live.mjs`, 9 controlli): caricamento multiplo, Storage privato, ricarica, ingrandimento, eliminazione anche del file. Provato su Edge a 390 px, non su iPhone.
+- Tema lilla (chiaro predefinito), nome e icone aggiornati.
+- Nuovo indirizzo `https://lilla-app.pages.dev` (progetto Pages `lilla-app`); il vecchio `dog-app.pages.dev` rimanda con un 301. Logo: impronta lilla scuro su lilla chiaro.
+- Menu e Home riordinati: archivio/documenti, agenda, spese, analisi, luoghi, AI in primo piano; alimentazione, attività, benessere e registrazioni rapide in secondo piano.
+- Album foto e video in Home, provato su Supabase reale (`tests/e2e/gallery-live.mjs`; con `VIDEO=file.mp4` prova anche la riproduzione): caricamento multiplo, Storage privato, frecce, griglia da 6, eliminazione anche del file, video riprodotto. Provato su Edge a 390 px, non su iPhone.
+- Importate nell'album di famiglia 160 foto (convertite in JPEG 1600 px) e 20 video (H.264, lato lungo 960 px) dallo zip sul Desktop: circa 114 MB su 1 GB del piano gratuito.
 - `npm test`: 21 su 22; il test con Gemini reale è andato in timeout (servizio lento).
 - La suite locale `tests/e2e/smoke.mjs` non è stata rieseguita dopo le modifiche.
 
@@ -39,7 +42,7 @@ Comandi: `node tests/cloud-check.mjs` (14 controlli sul backend Supabase) e `nod
 5. **iPhone/Safari**: installazione PWA, notifiche, fotocamera. Mai provato su un telefono. Windows: provato solo su Edge.
 6. **Notifiche push ad app chiusa**: NON implementate (servono VAPID + servizio push). Sono presenti promemoria in-app e notifiche del dispositivo mentre l'app è aperta.
 7. **Sincronizzazione tra due dispositivi reali**: non provata.
-8. **Aggiornamenti dell'app pubblicata**: il deploy è manuale (`npm run build` poi `wrangler pages deploy dist --project-name=dog-app`), non collegato a GitHub.
+8. **Aggiornamenti dell'app pubblicata**: il deploy è manuale (`npm run build` poi `wrangler pages deploy dist --project-name=lilla-app`), non collegato a GitHub.
 
 ## Non implementato / semplificato rispetto alla specifica
 - Foto/video allegati direttamente ai singoli eventi di salute/benessere: si caricano nell'Archivio (categoria foto/video).

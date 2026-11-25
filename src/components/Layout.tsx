@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react'
+import { Fragment, useEffect, useState } from 'react'
 import { NavLink, Outlet, useLocation } from 'react-router-dom'
 import { Activity, BookOpen, Bot, Calendar, CloudOff, FileText, Folder, HeartPulse, Home, LineChart, MapPin, Menu, Moon, PawPrint, RefreshCw, Settings, Smile, Sun, Utensils, Wallet, CheckCircle2, AlertTriangle } from 'lucide-react'
 import { useApp } from '../lib/app'
@@ -7,20 +7,20 @@ import type { SyncStatus } from '../lib/store'
 
 export const NAV = [
   { to: '/', label: 'Home', icon: Home, end: true },
-  { to: '/salute', label: 'Salute', icon: HeartPulse },
-  { to: '/alimentazione', label: 'Alimentazione', icon: Utensils },
-  { to: '/attivita', label: 'Attività', icon: Activity },
-  { to: '/benessere', label: 'Benessere', icon: Smile },
-  { to: '/spese', label: 'Spese', icon: Wallet },
-  { to: '/agenda', label: 'Agenda', icon: Calendar },
   { to: '/archivio', label: 'Archivio', icon: Folder },
-  { to: '/luoghi', label: 'Luoghi', icon: MapPin },
+  { to: '/agenda', label: 'Agenda', icon: Calendar },
+  { to: '/spese', label: 'Spese', icon: Wallet },
   { to: '/analisi', label: 'Analisi e report', icon: LineChart },
+  { to: '/luoghi', label: 'Luoghi', icon: MapPin },
   { to: '/ai', label: 'LILLA APP AI', icon: Bot },
-  { to: '/profilo', label: 'Profilo cagnolina', icon: PawPrint },
-  { to: '/impostazioni', label: 'Impostazioni', icon: Settings },
+  { to: '/salute', label: 'Salute', icon: HeartPulse, secondary: true },
+  { to: '/alimentazione', label: 'Alimentazione', icon: Utensils, secondary: true },
+  { to: '/attivita', label: 'Attività', icon: Activity, secondary: true },
+  { to: '/benessere', label: 'Benessere', icon: Smile, secondary: true },
+  { to: '/profilo', label: 'Profilo cagnolina', icon: PawPrint, secondary: true },
+  { to: '/impostazioni', label: 'Impostazioni', icon: Settings, secondary: true },
 ]
-const BOTTOM = ['/', '/salute', '/agenda', '/ai']
+const BOTTOM = ['/', '/archivio', '/agenda', '/spese']
 
 function useStatus(): SyncStatus {
   const { store } = useApp()
@@ -65,17 +65,18 @@ export function Layout() {
     <div className="flex h-full flex-col md:flex-row">
       <aside className="hidden w-60 shrink-0 flex-col border-r border-line bg-surface p-4 md:flex">
         <div className="mb-6 flex items-center gap-3 px-2">
-          <div className="grid size-10 place-items-center rounded-xl bg-primary text-primary-fg">
-            <PawPrint size={22} />
-          </div>
+          <img src="/icon.svg" alt="" className="size-10 rounded-xl border border-line" />
           <span className="font-display text-lg tracking-wide">LILLA APP</span>
         </div>
         <nav className="flex-1 space-y-0.5 overflow-y-auto">
-          {NAV.map((n) => (
-            <NavLink key={n.to} to={n.to} end={n.end} className={({ isActive }) => cx('flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm', isActive ? 'bg-primary text-primary-fg' : 'text-ink hover:bg-surface2')}>
-              <n.icon size={18} />
-              {n.label}
-            </NavLink>
+          {NAV.map((n, i) => (
+            <Fragment key={n.to}>
+              {n.secondary && !NAV[i - 1].secondary && <div className="px-3 pb-1 pt-4 text-[11px] font-semibold uppercase tracking-wider text-muted">Altro</div>}
+              <NavLink to={n.to} end={n.end} className={({ isActive }) => cx('flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm', isActive ? 'bg-primary text-primary-fg' : n.secondary ? 'text-muted hover:bg-surface2' : 'text-ink hover:bg-surface2')}>
+                <n.icon size={18} />
+                {n.label}
+              </NavLink>
+            </Fragment>
           ))}
         </nav>
         <button onClick={toggleTheme} className="mt-3 flex min-h-10 items-center gap-3 rounded-xl px-3 text-sm text-muted hover:bg-surface2">
@@ -94,7 +95,7 @@ export function Layout() {
         )}
         <header className="flex items-center justify-between gap-2 border-b border-line bg-surface px-4 py-2 safe-top md:justify-end">
           <span className="flex items-center gap-2 font-display text-lg md:hidden">
-            <PawPrint size={20} className="text-primary" /> LILLA APP
+            <img src="/icon.svg" alt="" className="size-7 rounded-lg border border-line" /> LILLA APP
           </span>
           <div className="flex items-center gap-2">
             <SyncBadge />

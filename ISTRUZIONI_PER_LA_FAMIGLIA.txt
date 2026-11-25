@@ -1,7 +1,7 @@
 LILLA APP — ISTRUZIONI PER LA FAMIGLIA
 ====================================
 
-INDIRIZZO DELL'APP:  https://dog-app.pages.dev
+INDIRIZZO DELL'APP:  https://lilla-app.pages.dev
 
 1) COME ENTRARE
    - Aprite l'indirizzo qui sopra.
